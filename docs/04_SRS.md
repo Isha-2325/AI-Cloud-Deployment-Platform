@@ -29,7 +29,8 @@ The purpose of this system is to reduce the manual effort involved in preparing 
 - Full CI/CD pipeline automation
 - Multi-container orchestration
 - Production-scale autoscaling and monitoring
-- Real deployment to cloud providers within the semester project scope
+- Fully automated cloud deployment to production environments.
+The platform will generate deployment artifacts and recommendations, while actual deployment remains optional and may be demonstrated only for selected platforms during the project.
 - Advanced security scanning and compliance auditing
 
 ## 4. Definitions
@@ -66,8 +67,9 @@ The system shall provide the following core functions:
 3. Analyze the uploaded project to identify the technology stack.
 4. Generate a deployment readiness score and checklist.
 5. Create a Dockerfile draft based on the detected stack.
-6. Recommend a suitable deployment platform.
-7. Maintain a history of uploaded projects and generated outputs.
+6. Recommend a suitable cloud platform and deployment strategy.
+7. Generate an AI-assisted deployment guide.
+8. Maintain a history of analyses and generated deployment artifacts.
 
 ## 8. User Classes
 
@@ -97,7 +99,7 @@ An administrator may manage user accounts, review system activity, and monitor p
 | FR-08 | The system shall generate a Dockerfile draft for supported project types. | High |
 | FR-09 | The system shall generate a deployment checklist based on the analysis result. | High |
 | FR-10 | The system shall provide a cloud platform recommendation based on the detected stack. | High |
-| FR-11 | The system shall store project analysis results and deployment history for each user. | High |
+| FR-11 | The system shall store project analysis reports and generated deployment artifacts for future reference. | High |
 | FR-12 | The system shall display the analysis report in a readable format to the user. | High |
 | FR-13 | The system shall allow users to view previous projects and generated outputs. | Medium |
 | FR-14 | The system shall provide error feedback when upload or analysis fails. | Medium |

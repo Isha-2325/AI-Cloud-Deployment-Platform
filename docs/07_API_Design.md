@@ -157,7 +157,7 @@ The backend of the AI DevOps Assistant exposes a RESTful API for all major funct
 | Response Body | { "file_name": "Dockerfile", "content": "FROM python:3.11-slim\n..." } |
 | Status Codes | 200 OK, 404 Not Found |
 
-## 7. Deployment APIs
+## 7. Deployment Guide APIs
 
 ### 7.1 Get Recommendation
 
@@ -170,39 +170,39 @@ The backend of the AI DevOps Assistant exposes a RESTful API for all major funct
 | Response Body | { "provider": "Render", "reason": "Suitable for Python and FastAPI applications", "confidence_score": 0.82 } |
 | Status Codes | 200 OK, 404 Not Found |
 
-### 7.2 Create Deployment Record
+### 7.2 Generate Deployment Guide
 
 | Field | Value |
 |---|---|
-| URL | /api/projects/{project_id}/deploy |
+| URL | /api/projects/{id}/guide |
 | Method | POST |
-| Description | Creates a deployment record and triggers deployment preparation. |
-| Request Body | { "provider": "Render", "environment": "staging" } |
-| Response Body | { "deployment_id": 2, "status": "pending" } |
+| Description | Generates an AI-assisted deployment guide for the project. |
+| Request Body | { "sections": ["prerequisites","steps","env"] } (optional) |
+| Response Body | { "deployment_guide": { "title": "Deployment Guide", "prerequisites": [], "steps": [], "recommended_provider": "Render", "docker_commands": [], "environment_variables": {} } } |
 | Status Codes | 201 Created, 400 Bad Request |
 
-### 7.3 Get Deployment Status
+### 7.3 Get Readiness Summary
 
 | Field | Value |
 |---|---|
-| URL | /api/deployments/{deployment_id} |
+| URL | /api/projects/{id}/readiness |
 | Method | GET |
-| Description | Retrieves the current status of a deployment request. |
+| Description | Returns readiness score, detected issues, and strengths for the project. |
 | Request Body | None |
-| Response Body | { "id": 2, "status": "success", "deployment_url": "https://sample-app.onrender.com" } |
+| Response Body | { "score": 84, "issues": [], "strengths": [] } |
 | Status Codes | 200 OK, 404 Not Found |
 
 ## 8. History APIs
 
-### 8.1 Get Deployment History
+### 8.1 Get Analysis History
 
 | Field | Value |
 |---|---|
 | URL | /api/history |
 | Method | GET |
-| Description | Returns deployment history for the authenticated user. |
+| Description | Returns analysis history for the authenticated user. |
 | Request Body | None |
-| Response Body | [ { "project_id": 10, "provider": "Render", "status": "success", "deployed_at": "2026-07-22T11:00:00Z" } ] |
+| Response Body | [ { "project_id": 10, "readiness_score": 84, "recommended_provider": "Render", "generated_at": "2026-07-22T11:00:00Z" } ] |
 | Status Codes | 200 OK |
 
 ### 8.2 Get Project History
@@ -211,7 +211,7 @@ The backend of the AI DevOps Assistant exposes a RESTful API for all major funct
 |---|---|
 | URL | /api/projects/{project_id}/history |
 | Method | GET |
-| Description | Returns all historical events for a single project. |
+| Description | Returns all historical events for a single project (analysis and generated artifacts). |
 | Request Body | None |
-| Response Body | { "project_id": 10, "events": ["uploaded", "analyzed", "dockerfile generated", "deployed"] } |
+| Response Body | { "project_id": 10, "events": ["uploaded", "analyzed", "dockerfile generated", "deployment guide generated"] } |
 | Status Codes | 200 OK, 404 Not Found |

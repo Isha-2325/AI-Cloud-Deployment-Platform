@@ -23,7 +23,7 @@ flowchart LR
 | PostgreSQL Database | Stores users, projects, analysis results, Dockerfile data, recommendations, and deployment history. |
 | Gemini API | Generates project analysis summaries, deployment readiness insights, Dockerfile suggestions, and checklist content. |
 | File Storage Layer | Stores uploaded archives or temporary project files for analysis. |
-| Recommendation Engine | Maps detected technology stack to probable deployment platforms and configuration strategies. |
+| Recommendation Engine | Analyzes the detected technology stack and project characteristics to recommend the most suitable cloud platform, deployment strategy (Container, Serverless, Static Hosting, or Virtual Machine), and deployment guidance. |
 
 ## 3. Data Flow
 
@@ -49,17 +49,28 @@ sequenceDiagram
 
 ## 4. AI Workflow
 
-The AI workflow is responsible for interpreting the project structure and generating useful guidance. The workflow is intentionally limited to analysis and recommendation so that the system remains realistic for a student project.
+The AI workflow is responsible for interpreting the project structure and generating useful guidance. The workflow follows a stepwise pipeline from upload to guide generation.
 
 ```mermaid
 flowchart TD
-    A[Receive Project Files] --> B[Extract Project Metadata]
-    B --> C[Identify Language and Framework]
-    C --> D[Inspect Dependencies and Structure]
-    D --> E[Generate Deployment Readiness Score]
-    E --> F[Generate Dockerfile Draft]
-    F --> G[Generate Cloud Recommendation]
-    G --> H[Generate Deployment Checklist]
+    A[Upload ZIP / GitHub Repository]
+    B[Extract Project Files]
+    C[Detect Language & Framework]
+    D[Analyze Dependencies]
+    E[Generate Project Summary]
+    F[Calculate Deployment Readiness Score]
+    G[Generate Dockerfile]
+    H[Recommend Cloud Platform]
+    I[Generate Deployment Guide]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
 ```
 
 ## 5. Backend Architecture

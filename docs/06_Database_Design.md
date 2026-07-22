@@ -49,8 +49,10 @@ The database supports the following core relationships:
 | project_id | INT | FOREIGN KEY REFERENCES projects(id) | Associated project |
 | language | VARCHAR(100) | NOT NULL | Detected primary language |
 | framework | VARCHAR(100) | NULL | Detected framework |
-| dependencies | TEXT | NULL | Summary of dependencies |
+| dependencies | JSONB | NULL | Stores detected dependencies as a structured JSON array. |
 | structure_summary | TEXT | NULL | Summary of project structure |
+| issues | JSONB | NULL | Stores detected deployment issues. |
+| strengths | JSONB | NULL | Stores detected project strengths. |
 | readiness_score | INT | NOT NULL | Numerical readiness score |
 | ai_summary | TEXT | NULL | AI-generated narrative summary |
 | created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Analysis timestamp |
@@ -73,22 +75,23 @@ The database supports the following core relationships:
 | id | SERIAL | PRIMARY KEY | Unique recommendation identifier |
 | project_id | INT | FOREIGN KEY REFERENCES projects(id) | Associated project |
 | provider | VARCHAR(100) | NOT NULL | Recommended provider such as Render or Railway |
+| deployment_type | VARCHAR(50) | NULL | Recommended deployment type (Container, Serverless, Static Hosting, Virtual Machine) |
 | reason | TEXT | NOT NULL | Explanation for recommendation |
 | confidence_score | DECIMAL(4,2) | NOT NULL | Confidence level |
 | estimated_cost | VARCHAR(100) | NULL | Optional cost estimate |
 | created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Recommendation timestamp |
 
-### 3.6 Deployments
+### 3.6 Analysis_History
 
 | Column | Type | Constraints | Description |
 |---|---|---|---|
-| id | SERIAL | PRIMARY KEY | Unique deployment record identifier |
+| id | SERIAL | PRIMARY KEY | Unique analysis history identifier |
 | project_id | INT | FOREIGN KEY REFERENCES projects(id) | Associated project |
-| provider | VARCHAR(100) | NOT NULL | Deployment target provider |
-| environment | VARCHAR(50) | NOT NULL | Example: staging or production |
-| deployment_url | TEXT | NULL | URL returned after deployment |
-| status | VARCHAR(50) | NOT NULL | Pending, success, or failed |
-| deployed_at | TIMESTAMP | NULL | Deployment completion time |
+| readiness_score | INT | NOT NULL | Readiness score captured at analysis time |
+| recommended_provider | VARCHAR(255) | NULL | Provider recommended by the analysis |
+| generated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Timestamp when analysis/report was generated |
+
+Note: This table stores generated analysis reports and artifacts. It does not track actual deployment URLs, environments, or runtime status.
 
 ## 4. Primary Keys
 
@@ -97,7 +100,8 @@ The database supports the following core relationships:
 - analyses.id
 - docker_files.id
 - recommendations.id
-- deployments.id
+- analysis_history.id
+- project_files.id
 
 ## 5. Foreign Keys
 
@@ -105,7 +109,8 @@ The database supports the following core relationships:
 - analyses.project_id → projects.id
 - docker_files.project_id → projects.id
 - recommendations.project_id → projects.id
-- deployments.project_id → projects.id
+- analysis_history.project_id → projects.id
+- project_files.project_id → projects.id
 
 ## 6. Relationships
 
@@ -115,7 +120,8 @@ The database supports the following core relationships:
 | projects | analyses | One-to-one |
 | projects | docker_files | One-to-many |
 | projects | recommendations | One-to-many |
-| projects | deployments | One-to-many |
+| projects | analysis_history | One-to-many |
+| projects | project_files | One-to-many |
 
 ## 7. Suggested Indexes
 
@@ -125,7 +131,8 @@ The database supports the following core relationships:
 | idx_projects_user_id | projects | Improve retrieval of projects by user |
 | idx_analyses_project_id | analyses | Improve analysis lookup by project |
 | idx_recommendations_project_id | recommendations | Improve recommendation lookup |
-| idx_deployments_project_id | deployments | Improve deployment history retrieval |
+| idx_analysis_history_project_id | analysis_history | Improve analysis history retrieval |
+| idx_project_files_project_id | project_files | Improve retrieval of project files by project |
 
 ## 8. Mermaid ER Diagram
 
@@ -135,5 +142,17 @@ erDiagram
     PROJECTS ||--|| ANALYSES : has
     PROJECTS ||--o{ DOCKER_FILES : generates
     PROJECTS ||--o{ RECOMMENDATIONS : receives
-    PROJECTS ||--o{ DEPLOYMENTS : contains
+    PROJECTS ||--o{ PROJECT_FILES : contains
+    PROJECTS ||--o{ ANALYSIS_HISTORY : contains
 ```
+
+### 3.7 Project_Files
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| id | SERIAL | PRIMARY KEY | Unique file identifier |
+| project_id | INT | FOREIGN KEY REFERENCES projects(id) | Associated project |
+| file_name | VARCHAR(255) | NOT NULL | Name of the file |
+| file_path | TEXT | NOT NULL | Path inside the uploaded archive or repo |
+| file_size | BIGINT | NULL | File size in bytes |
+| uploaded_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Time file was recorded |
